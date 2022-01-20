@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Test 1.3</title>
+</head>
+<body>
+    <div id = "status" name = "status">Status Message</div>
+    <script type = "text/javascript">
+        var db = openDatabase('mydb', '1.0', 'Test DB', 2 * 1024 * 1024);
+        var Databd;
+        var name = 'TEST';
+        db.transaction(function (tx) {
+        // Сздание базы данных
+        tx.executeSql('CREATE TABLE TEST (id unique, val)');
+        // Заполнение данными базы данных
+        tx.executeSql('insert into ' + name + '(' + "ISBN, Auth, Title, Quantity, Genre, Dat" + ') values(' + "?, ?, ?, ?, ?, ?" + ')', ["978" , "Имя1 Фамилия1, Имя2 Фамилия2, Имя3 Фамилия3", "Название1", "515", "Фантастика", "28.04.2003"]);
+        tx.executeSql('insert into ' + name + '(' + "ISBN, Auth, Title, Quantity, Genre, Dat" + ') values(' + "?, ?, ?, ?, ?, ?" + ')', ["6546" , "Имя7 Фамилия7, Имя4 Фамилия4", "Название2", "312", "Роман", "17.11.2001"]);
+        tx.executeSql('insert into ' + name + '(' + "ISBN, Auth, Title, Quantity, Genre, Dat" + ') values(' + "?, ?, ?, ?, ?, ?" + ')', ["978 54", "Имя5 Фамилия5", "Название3", "860", "Фантастика", "09.03.2020"]);
+        tx.executeSql('insert into ' + name + '(' + "ISBN, Auth, Title, Quantity, Genre, Dat" + ') values(' + "?, ?, ?, ?, ?, ?" + ')', ["8596" , "Имя7 Фамилия7, Имя1 Фамилия3, Имя4 Фамилия6", "Название4", "336", "Приключения", "07.11.2010"]);
+        tx.executeSql('insert into ' + name + '(' + "ISBN, Auth, Title, Quantity, Genre, Dat" + ') values(' + "?, ?, ?, ?, ?, ?" + ')', ["787" , "Имя7 Фамилия7", "Название5", "780", "Мистика", "01.01.1998"]);
+        tx.executeSql('insert into ' + name + '(' + "ISBN, Auth, Title, Quantity, Genre, Dat" + ') values(' + "?, ?, ?, ?, ?, ?" + ')', ["952" , "Имя6 Фамилия8", "Название6", "350", "Психология", "10.09.2021"]);
+        tx.executeSql('insert into ' + name + '(' + "ISBN, Auth, Title, Quantity, Genre, Dat" + ') values(' + "?, ?, ?, ?, ?, ?" + ')', ["15 97" , "Имя8 Фамилия9", "Название7", "420", "Наука и образование", "11.11.2021"]);
+        })
+        // Получение данных по SQL-запросу SELECT - Всех данных
+        db.transaction(function (tx) {
+        tx.executeSql('SELECT * FROM TEST', [], function (tx, results) {
+        var len = results.rows.length, i;
+        
+        for (i = 0; i < len; i++) {
+            Databd = "<p><b>" + results.rows.item(i).log + "</b></p>";
+             document.querySelector('#status').innerHTML += Databd;
+        }
+        }, null);
+        });
+        
+        // Получение данных по SQL-запросу SELECT - Выборка Названия книг и Авторов с жанром Фантастика
+        var sql = `select * from ${name}`;
+        //document.querySelector('.table').innerHTML = '';
+        db.transaction(function(tx) {
+        tx.executeSql(sql, [], function(tx, result) {
+            var n = result.rows.length;
+            var MasAuth;
+            var MasTitle;
+            for(var i = 0; i < n; i++) {
+            var work = result.rows.item(i);
+            if (work.Genre == "Фантастика"){
+            MasTitle += ", " + work.Title;
+            MasAuth += ", " + work.Auth;
+        }
+        }
+        alert("Названия книг: " + MasTitle + ';' + 'Авторы: ' + MasAuth);
+        //document.querySelector('#status').innerHTML +=
+        });
+        });
+        
+        // Получение данных по SQL-запросу SELECT - Автор, написавший больше всего книг
+        function getWordCount(array) {
+        let map = {};
+        
+        for (let i = 0; i < array.length; i++) {
+        let item = array[i];
+        map[item] = (map[item] + 1) || 1;
+        }
+        return map;
+        }
+        var sql = `select * from ${name}`;
+        //document.querySelector('.table').innerHTML = '';
+        db.transaction(function(tx) {
+        tx.executeSql(sql, [], function(tx, result) {
+            var n = result.rows.length;
+            var MasAuth;
+            var MasTitle;
+            var Temp1;
+            var Temp = [];
+            for(var i = 0; i < n; i++) {
+            var work = result.rows.item(i);
+            for (var j = 0; j < work.Auth.split(',').length; j++){
+            Temp.push(work.Auth.split(',')[j]);
+        }
+        }
+            var uniqueArray = [...new Set(Temp)];
+            var counter = [];
+            for(var i = 0; i < uniqueArray.length; i++) {
+            for (let elem of Temp) {
+            if (elem == uniqueArray[i]) {
+            counter[i] = counter[i] + 1;
+        }
+        }
+        }
+            var id = 0;
+            var max = 0;
+            
+            for(var i = 0; i < counter.length; i++){
+            if(counter[i] > max){
+            max = counter[i];
+            id = i;
+        }
+        }
+        alert("Автор, написавший больше всего книг: " + uniqueArray[id]);
+        });
+        });
+        
+        </script>
+</body>
+</html>
